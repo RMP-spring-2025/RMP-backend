@@ -1,0 +1,12 @@
+[submodule "RMP-product-service"]
+	path = RMP-product-service
+	url = https://github.com/RMP-spring-2025/RMP-product-service
+	branch = release
+[submodule "RMP-request-handler-service"]
+	path = RMP-request-handler-service
+	url = https://github.com/RMP-spring-2025/RMP-request-handler-service
+	branch = release
+[submodule "RMP-user-service"]
+	path = RMP-user-service
+	url = https://github.com/RMP-spring-2025/RMP-user-service
+	branch = release
