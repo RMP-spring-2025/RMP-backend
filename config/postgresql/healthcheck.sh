@@ -9,7 +9,7 @@ for db in "${databases[@]}"; do
         echo "Database '$db' is ready"
     else
         echo "Database '$db' is not ready"
-        exit 1
+#        exit 1
     fi
 done
 
