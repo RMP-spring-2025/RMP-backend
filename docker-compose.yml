@@ -1,0 +1,108 @@
+services:
+  postgresql:
+    image: postgres:latest
+    container_name: rmp_postgresql
+    environment:
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'admin_db'
+      POSTGRES_INITDB_ARGS: '--auth-host=trust'
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ./config/postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./config/postgresql/healthcheck.sh:/healthcheck.sh
+    healthcheck:
+      test: ['CMD-SHELL', 'bash /healthcheck.sh']
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    ports:
+      - 5432:5432
+    networks:
+      - rmp_network
+
+
+  keydb:
+    image: eqalpha/keydb:latest
+    container_name: rmp_keydb
+    volumes:
+      - keydb_data:/data
+    ports:
+      - 6379:6379
+    networks:
+      - rmp_network
+
+  rmp_request_handler_service:
+    build:
+      context: RMP-request-handler-service
+      dockerfile: Dockerfile
+    container_name: rmp_request_handler_service
+    ports:
+      - 8080:8080
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      keydb:
+        condition: service_started
+    environment:
+      POSTGRES_URL: 'jdbc:postgresql://postgresql:5432/db'
+      POSTGRES_USER: 'user_rhs'
+      POSTGRES_PASSWORD: 'password'
+      KEYDB_URL: 'redis://keydb:6379'
+      APP_PORT: 8080
+    networks:
+      - rmp_network
+
+  rmp_product_service:
+    build:
+      context: RMP-product-service
+      dockerfile: Dockerfile
+    container_name: rmp_product_service
+    ports:
+      - 8081:8081
+    depends_on:
+      rmp_request_handler_service:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+      keydb:
+        condition: service_started
+    environment:
+      POSTGRES_DB: 'product_db'
+      POSTGRES_USER: 'user_ps'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_PORT: 5432
+      REDIS_PORT: 6379
+      APP_PORT: 8081
+    networks:
+      - rmp_network
+
+  rmp_user_service:
+    build:
+      context: RMP-user-service
+      dockerfile: Dockerfile
+    container_name: rmp_user_service
+    ports:
+      - 8082:8080
+    depends_on:
+      rmp_request_handler_service:
+        condition: service_started
+      postgresql:
+        condition: service_healthy
+      keydb:
+        condition: service_started
+    environment:
+      rmp-user-service_PostgresURL: 'jdbc:postgresql://postgresql:5432/user_db'
+      rmp-user-service_PostgresUser: 'user_us'
+      rmp-user-service_PostgresPassword: 'password'
+      rmp-user-service_KeyDBURL: 'redis://keydb:6379'
+    networks:
+      - rmp_network
+
+volumes:
+  keydb_data:
+  postgresql_data:
+
+networks:
+  rmp_network:
