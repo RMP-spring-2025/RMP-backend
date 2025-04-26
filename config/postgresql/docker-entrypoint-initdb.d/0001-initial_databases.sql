@@ -25,5 +25,3 @@ ALTER SCHEMA public OWNER TO user_ps;
 GRANT ALL PRIVILEGES ON DATABASE user_db TO user_us;
 GRANT ALL ON SCHEMA public TO user_us;
 ALTER SCHEMA public OWNER TO user_us;
-
-INSERT into db.public.users values ''
