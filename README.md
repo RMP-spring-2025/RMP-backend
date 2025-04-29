@@ -5,7 +5,7 @@
 
 Обновить submodule'и. После ```git submodule init``` и когда хотите получить актуальные коммиты submodule'ей.
 ```
-    git submodule update --recursive --remote
+    git submodule update
 ```
 
 Для очистки баз данных. Т.к. мы не пишем скрипты для миграции баз данных, то понадобится при каждом изменении структуры БД. 
