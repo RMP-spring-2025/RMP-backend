@@ -62,8 +62,8 @@ services:
     ports:
       - 8081:8081
     depends_on:
-#      rmp_request_handler_service:
-#        condition: service_healthy
+      rmp_request_handler_service:
+       condition: service_started
       postgresql:
         condition: service_healthy
       keydb:
