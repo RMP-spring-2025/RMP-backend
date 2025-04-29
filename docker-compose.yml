@@ -101,6 +101,7 @@ services:
       rmp-user-service_PostgresUser: 'admin'
       rmp-user-service_PostgresPassword: 'password'
       rmp-user-service_KeyDBURL: 'redis://keydb:6379'
+      rmp-user-service_DBChangelogFilePath: 'db/changelog/changelog-master.xml'
     networks:
       - rmp_network
 
